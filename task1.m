@@ -1,0 +1,60 @@
+clc,clear,close all
+imshow('1.png', 'XData', [-126.1*111, -66*111], 'YData', [50*111,25*111]);
+hold on;
+y=xlsread('1.xlsx','sheet1','L1:L2944');
+x=xlsread('1.xlsx','sheet1','M1:M2944');
+y=y*111;
+x=x*111;
+scatter(x,y,'k','.');
+
+hold on
+num=1;
+X_cars=zeros(1,1);
+Y_cars=zeros(1,1);
+y1=xlsread('1.xlsx','sheet2','D2:D49');
+x1=xlsread('1.xlsx','sheet2','E2:E49');
+y2=xlsread('1.xlsx','sheet2','F2:F49');
+x2=xlsread('1.xlsx','sheet2','G2:G49');
+x1=x1*111;
+x2=x2*111;
+y1=y1*111;
+y2=y2*111;
+car_num=xlsread('1.xlsx','sheet2','H2:H49');
+tes_num=xlsread('1.xlsx','sheet2','I2:I49');
+city_car=zeros(48,1);
+suburb_car=zeros(48,1);
+village_car=zeros(48,1);
+n=size(x1);
+n=n(1);
+state_tes_num=zeros(n,1);
+i=1;
+while(i<=n)
+    car_num(i,1)=round(car_num(i,1)/2/100/24);
+    cn=car_num(i,1);
+    j=1;
+    while(j<=cn)
+        X_cars(num,1)=rand*(x2(i,1)-x1(i,1))+x1(i,1);
+        Y_cars(num,1)=rand*(y1(i,1)-y2(i,1))+y2(i,1);
+        num=num+1;
+        j=j+1;
+    end
+    i=i+1;
+end
+scatter(X_cars,Y_cars,'r','.');
+set(gca,'YDir','normal')
+i=1;
+while(i<=n)
+    a=round((car_num(i,1)-tes_num(i,1)*3*(2+0.1))/(3*(2+0.1)));
+    if(a<0)
+        a=0;
+    end
+    state_tes_num(i,1)=a;
+    city_car(i,1)=round(a*0.27);
+    suburb_car(i,1)=round(a*0.54);
+    village_car(i,1)=round(a*0.18);
+    i=i+1;
+end
+xlswrite('1.xlsx',state_tes_num,'sheet2','J2:J49');
+xlswrite('1.xlsx',city_car,'sheet2','K2:K49');
+xlswrite('1.xlsx',suburb_car,'sheet2','L2:L49');
+xlswrite('1.xlsx',village_car,'sheet2','M2:M49');

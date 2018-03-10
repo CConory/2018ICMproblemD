@@ -1,0 +1,92 @@
+clc,clear,close all
+imshow('seoul.png', 'XData', [126.754690*111, 127.191396*111], 'YData', [37.700715*111,37.426394*111]);
+hold on;
+X_cars=zeros(1,1);
+Y_cars=zeros(1,1);
+y1=xlsread('1.xlsx','sheet3','B6:B6');
+x1=xlsread('1.xlsx','sheet3','C6:C6');
+y2=xlsread('1.xlsx','sheet3','D6:D6');
+x2=xlsread('1.xlsx','sheet3','E6:E6');
+x1=x1*111;
+x2=x2*111;
+y1=y1*111;
+y2=y2*111;
+car_num=xlsread('1.xlsx','sheet3','J6:J6');
+n=size(x1);
+n=n(1);
+state_stop_num=zeros(1,1);
+X_stop_sit=zeros(n,1000);
+Y_stop_sit=zeros(n,1000);
+i=1;
+num=1;
+while(i<=n)
+    car_num(i,1)=ceil(car_num(i,1)/2/100/10/24);
+    cn=car_num(i,1);
+    j=1;
+    X_state_cars=zeros(1,1);
+    Y_state_cars=zeros(1,1);
+    while(j<=cn)
+        X_cars(num,1)=rand*(x2(i,1)-x1(i,1))+x1(i,1);
+        Y_cars(num,1)=rand*(y1(i,1)-y2(i,1))+y2(i,1);
+        X_state_cars(j,1)=X_cars(num,1);
+        Y_state_cars(j,1)=Y_cars(num,1);
+        num=num+1;
+        j=j+1;
+    end  
+    j=j-1;
+    a=ceil(j/(3*(2+0.18)));
+    if(a<0)
+        a=0;
+    end
+    state_stop_num(1,i)=a;
+    X_tmp=zeros(1,1);
+    Y_tmp=zeros(1,1);
+    gg=1;
+    Min=inf;
+    min=1;
+    while(gg<=40000)
+        k=1;
+        while(k<=a)
+            X_tmp(gg,k)=rand*(x2(i,1)-x1(i,1))+x1(i,1);
+            Y_tmp(gg,k)=rand*(y1(i,1)-y2(i,1))+y2(i,1);
+            ii=1;
+            while(ii<k)
+                if(X_tmp(gg,k)==X_tmp(gg,ii)&&Y_tmp(gg,k)==Y_tmp(gg,ii))
+                    k=k-1;
+                    break;
+                end
+                ii=ii+1;
+            end
+            k=k+1;
+        end
+        k=1;
+        sum=0;
+        while(k<=a)
+            ii=1;
+            p1=[X_tmp(gg,k) Y_tmp(gg,k)];
+            
+            while(ii<=j)
+                p2=[X_state_cars(ii,1) Y_state_cars(ii,1) ];
+                sum=sum+norm(p1-p2);
+                ii=ii+1;
+            end      
+            k=k+1;
+        end
+        if(sum<=Min)
+            Min=sum;
+            min=gg;
+        end
+        gg=gg+1;
+    end
+    j=1;
+    while(j<=state_stop_num(i))
+        X_stop_sit(i,j)=X_tmp(min,j);
+        Y_stop_sit(i,j)=Y_tmp(min,j);
+        j=j+1;
+    end
+    scatter( X_stop_sit(i,:),Y_stop_sit(i,:),'g');
+    i=i+1;
+end
+scatter(X_cars,Y_cars,'k','.');
+set(gca,'YDir','normal')
+save('task2b-10.mat');
